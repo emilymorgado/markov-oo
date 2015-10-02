@@ -4,9 +4,10 @@ from random import choice
 
 class SimpleMarkovGenerator(object):
 
-    def __init__(self, filepaths):
+    def __init__(self, filepaths, ngram_size=2):
         self.input_filepaths = filepaths
         self.chains = {}
+        self.ngram_size = ngram_size
 
 
     def read_files(self):
@@ -27,9 +28,27 @@ class SimpleMarkovGenerator(object):
     def make_chains(self, input_text_string):
         """Takes input text as string; stores chains."""
 
-        # your code here which works on self.chains
+        words = input_text_string.split()
+        words.append(None)
 
-        #don't return chains
+        # initialize active ngram with first n words of input text
+        ngram_list = []
+        for i in range(self.ngram_size):
+            ngram_list.append(words[i])
+        active_ngram = tuple(ngram_list)
+
+        # for each word *after* initial ngram, add it to the dictionary entry for the ngram preceeding it
+        for i in range(self.ngram_size, len(words)):
+            if active_ngram in self.chains:
+                self.chains[active_ngram].append(words[i])
+            else:
+                self.chains[active_ngram] = [words[i]]
+
+            # move to the next ngram
+            active_ngram = active_ngram[1:] + (words[i],)
+
+
+
 
     def make_text(self, chains):
         """Takes dictionary of markov chains; returns random text."""
